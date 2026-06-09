@@ -222,4 +222,4 @@ The repo includes additional benchmarks beyond the fraud/maintenance core: tempo
 
 ## Citation
 
-If you use ARL in research, a citation to this repo is appreciated. Academic write-up in progress (ICML DistShift workshop path, target Aug 2026).
+If you use ARL in research, a citation to this repo is appreciated.
