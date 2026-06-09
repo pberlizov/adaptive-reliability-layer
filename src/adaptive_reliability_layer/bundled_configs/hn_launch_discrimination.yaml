@@ -1,0 +1,80 @@
+# HN launch — hard fraud slices + Elliptic/BAF for the public comparison table.
+
+operating_mode: bounded_auto
+model_version: hn-discrimination-v1
+
+bounded_auto_actions:
+  - none
+  - hold
+  - recalibrate
+  - label_shift
+  - reset
+  - adapt
+
+policy:
+  name: regime_aware_delayed_bandit
+  bandit_alpha: 0.85
+  scheduled_retrain_interval: 6
+  allowed_actions:
+    - none
+    - hold
+    - recalibrate
+    - label_shift
+    - reset
+    - adapt
+
+monitor:
+  alert_threshold: 1.15
+  severe_threshold: 1.65
+  risk_alert_threshold: 9.0
+  risk_decay: 0.90
+
+kpi:
+  false_alert_cost: 0.06
+  retrain_recommendation_cost: 0.08
+
+replay:
+  batch_size: 64
+  label_delay_steps: 12
+  label_delay_jitter_steps: 2
+  max_steps: 24
+
+discrimination_benchmark:
+  controller_name: regime_aware_delayed_bandit
+  min_rankable_metrics: 2
+  min_metric_spread: 0.005
+  false_positive_cost: 1.0
+  false_negative_cost: 10.0
+  strategies:
+    - frozen
+    - scheduled_retrain
+    - naive
+    - regime_aware_delayed_bandit
+    - delayed_hybrid
+    - correction_plus_governor
+  sources:
+    - id: ieee_cis_fraud_torch_hard
+      tier: discrimination
+      description: IEEE-CIS hard temporal tail (50/50 split)
+      steps: 24
+      label_delay_steps: 12
+    - id: ulb_creditcard_fraud_torch_hard
+      tier: discrimination
+      description: ULB hard temporal tail
+      steps: 24
+      label_delay_steps: 12
+    - id: paysim_fraud_torch_hard
+      tier: discrimination
+      description: PaySim hard slice
+      steps: 24
+      label_delay_steps: 8
+    - id: elliptic_fraud_torch_hard
+      tier: discrimination
+      description: Elliptic Bitcoin hard temporal slice
+      steps: 24
+      label_delay_steps: 12
+    - id: baf_fraud_torch_hard
+      tier: discrimination
+      description: BAF Base account fraud hard slice
+      steps: 24
+      label_delay_steps: 12

@@ -1,0 +1,62 @@
+# Design-partner replay — bounded_auto after shadow sign-off (tight intervention budget).
+operating_mode: bounded_auto
+model_version: customer-bounded-v1
+
+bounded_auto_actions:
+  - none
+  - hold
+  - recalibrate
+  - label_shift
+  - reset
+
+policy:
+  name: regime_aware_delayed_bandit
+  bandit_alpha: 0.85
+  allowed_actions:
+    - none
+    - hold
+    - recalibrate
+    - label_shift
+    - reset
+
+monitor:
+  alert_threshold: 1.15
+  severe_threshold: 1.65
+  risk_alert_threshold: 9.0
+  risk_decay: 0.90
+
+safety_budget:
+  enabled: true
+  window_steps: 32
+  max_auto_actions_per_window: 1
+  max_resets_per_window: 1
+  downgrade_to_recommend: true
+
+kpi:
+  accuracy_weight: 0.85
+  false_alert_cost: 0.12
+  drift_cost: 0.04
+  abstention_cost: 0.08
+  reset_cost: 0.06
+  retrain_recommendation_cost: 0.12
+
+replay:
+  batch_size: 64
+  label_delay_steps: 12
+  max_steps: null
+
+governance:
+  audit_db_path: results/customer_replay/audit.db
+  snapshot_dir: results/customer_replay/snapshots
+  environment: customer_bounded_auto
+  persist_snapshots_in_shadow: false
+  persist_snapshots_on_recommend: false
+  persist_snapshots_on_mutation: true
+
+sota:
+  enabled: true
+  proactive_drift_enabled: true
+  online_conformal_enabled: true
+  drift_detector_enabled: true
+
+log_json: false

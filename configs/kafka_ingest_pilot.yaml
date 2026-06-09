@@ -1,0 +1,56 @@
+operating_mode: shadow
+model_version: paysim-kafka-worker-v1
+
+bounded_auto_actions:
+  - none
+  - hold
+  - recalibrate
+  - label_shift
+  - reset
+
+policy:
+  name: regime_aware_delayed_bandit
+  bandit_alpha: 0.85
+  allowed_actions:
+    - none
+    - hold
+    - recalibrate
+    - label_shift
+    - reset
+
+replay:
+  batch_size: 64
+  label_delay_steps: 4
+
+governance:
+  audit_db_path: results/kafka_worker/audit.db
+  snapshot_dir: results/kafka_worker/snapshots
+  environment: kafka_worker
+
+policy_state_backend: file
+policy_state_path: null
+policy_state_save_path: results/kafka_worker/policy_state.json
+
+metrics:
+  enabled: false
+
+log_json: false
+
+serving:
+  model_bundle: paysim_fraud_torch
+  max_batch_rows: 256
+  allow_duplicate_batch_id: false
+
+kafka:
+  bootstrap_servers: localhost:9092
+  events_topic: arl.events
+  labels_topic: arl.labels
+  decisions_topic: arl.decisions
+  group_id: arl-sidecar-pilot
+  auto_offset_reset: earliest
+  # Production broker auth:
+  # security_protocol: SASL_SSL
+  # sasl_mechanism: SCRAM-SHA-512
+  # sasl_username: arl-worker
+  # ssl_ca_location: /etc/ssl/certs/ca.pem
+  # sasl_password via ARL_KAFKA_SASL_PASSWORD env

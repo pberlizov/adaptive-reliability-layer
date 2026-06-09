@@ -1,0 +1,36 @@
+operating_mode: bounded_auto
+model_version: bounded-auto-demo-v1
+
+bounded_auto_actions:
+  - none
+  - hold
+  - bn_refresh
+  - recalibrate
+  - label_shift
+
+policy:
+  name: bandit
+
+monitor:
+  alert_threshold: 1.1
+  severe_threshold: 1.75
+  risk_alert_threshold: 8.0
+  risk_decay: 0.92
+
+replay:
+  batch_size: 48
+  label_delay_steps: 0
+  max_steps: 90
+
+governance:
+  audit_db_path: results/bounded_auto_demo/audit.db
+  snapshot_dir: results/bounded_auto_demo/snapshots
+  environment: demo
+  persist_snapshots_in_shadow: false
+  persist_snapshots_on_recommend: false
+  persist_snapshots_on_mutation: true
+
+metrics:
+  enabled: false
+
+log_json: false

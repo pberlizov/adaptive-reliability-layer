@@ -1,0 +1,39 @@
+operating_mode: shadow
+model_version: fraud-public-benchmark-v1
+
+bounded_auto_actions:
+  - none
+  - hold
+  - bn_refresh
+  - recalibrate
+  - label_shift
+
+policy:
+  name: multi_action
+  mild_threshold: 0.95
+  severe_threshold: 1.55
+  cooldown_steps: 2
+  bandit_alpha: 0.75
+
+replay:
+  batch_size: 64
+  label_delay_steps: 0
+  max_steps: 24
+
+governance:
+  audit_db_path: results/fraud_public_benchmark/audit.db
+  snapshot_dir: results/fraud_public_benchmark/snapshots
+  environment: fraud_benchmark
+  persist_snapshots_in_shadow: false
+  persist_snapshots_on_recommend: false
+  persist_snapshots_on_mutation: true
+
+metrics:
+  enabled: false
+
+log_json: false
+
+sources:
+  - openml_credit_g
+  - paysim_fraud
+  - ieee_cis_fraud
