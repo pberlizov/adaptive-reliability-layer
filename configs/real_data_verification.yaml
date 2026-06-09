@@ -1,0 +1,40 @@
+operating_mode: shadow
+model_version: verification-v1
+
+policy:
+  name: bandit
+
+replay:
+  batch_size: 32
+  label_delay_steps: 2
+  max_steps: 18
+
+governance:
+  audit_db_path: results/real_data_verification/audit.db
+  snapshot_dir: results/real_data_verification/snapshots
+  environment: verification
+  persist_snapshots_in_shadow: false
+  persist_snapshots_on_recommend: false
+  persist_snapshots_on_mutation: true
+
+metrics:
+  enabled: true
+  prometheus_port: 9091
+
+log_json: false
+
+sources:
+  - breast_cancer
+  - digits
+  - tabular_breast_cancer_shift
+  - openml_credit_g
+  - paysim_fraud
+  - ieee_cis_fraud
+  - openml_electricity
+  - wilds_civilcomments_csv
+
+verification:
+  fraud_wedge_source: paysim_fraud
+  strategies:
+    - frozen
+    - regime_aware_delayed_bandit

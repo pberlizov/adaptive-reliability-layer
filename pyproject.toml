@@ -1,0 +1,109 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adaptive-reliability-layer"
+version = "0.3.4"
+description = "Research prototype and commercial runtime for safe continual test-time adaptation under distribution shift."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "BUSL-1.1"
+license-files = ["LICENSE"]
+authors = [{ name = "Adaptive Reliability Layer contributors" }]
+keywords = ["machine-learning", "fraud", "distribution-shift", "mlops", "reliability"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "numpy>=1.24",
+    "scikit-learn>=1.3",
+    "pyyaml>=6.0",
+    "pandas>=2.0",
+]
+
+[project.optional-dependencies]
+torch = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+]
+runtime = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+]
+research = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "wilds>=2.0",
+]
+dev = [
+    "pytest>=7.0",
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "fastapi>=0.100",
+    "uvicorn>=0.23",
+    "httpx>=0.25",
+]
+prometheus = [
+    "prometheus-client>=0.19",
+]
+serving = [
+    "fastapi>=0.100",
+    "uvicorn>=0.23",
+    "httpx>=0.25",
+]
+kafka = [
+    "confluent-kafka>=2.3",
+]
+redis = [
+    "redis>=5.0",
+]
+all = [
+    "pytest>=7.0",
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "wilds>=2.0",
+    "fastapi>=0.100",
+    "uvicorn>=0.23",
+    "httpx>=0.25",
+    "prometheus-client>=0.19",
+    "confluent-kafka>=2.3",
+    "redis>=5.0",
+]
+
+[project.urls]
+Homepage = "https://pypi.org/project/adaptive-reliability-layer/"
+
+[project.scripts]
+arl-demo = "adaptive_reliability_layer.cli:demo_main"
+arl-export-datasets = "adaptive_reliability_layer.cli:export_datasets_main"
+arl-hn-launch = "adaptive_reliability_layer.cli:hn_launch_main"
+arl-offline-replay = "adaptive_reliability_layer.cli:offline_replay_main"
+arl-customer-replay = "adaptive_reliability_layer.cli:customer_replay_main"
+arl-pilot = "adaptive_reliability_layer.cli:pilot_main"
+arl-metrics = "adaptive_reliability_layer.cli:metrics_main"
+arl-verify-real-data = "adaptive_reliability_layer.cli:real_data_verification_main"
+arl-outreach-validation = "adaptive_reliability_layer.cli:outreach_validation_main"
+arl-fraud-benchmark = "adaptive_reliability_layer.cli:fraud_public_benchmark_main"
+arl-serve = "adaptive_reliability_layer.cli:serve_main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+adaptive_reliability_layer = ["bundled_configs/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "slow: integration tests that load real datasets and train models",
+]

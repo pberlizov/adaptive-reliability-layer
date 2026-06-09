@@ -1,0 +1,36 @@
+services:
+  replay:
+    build: .
+    volumes:
+      - ./results:/app/results
+      - ./configs:/app/configs
+      - ./data:/app/data
+    command: >
+      python3 scripts/run_pilot_case_study.py
+      --config configs/pilot_fraud_tabular.yaml
+      --output-dir results/pilot
+
+  arl-sidecar:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./results/sidecar:/app/results/sidecar
+      - ./configs:/app/configs
+      - ./data:/app/data
+    environment:
+      ARL_FORCE_SHADOW: "1"
+      # ARL_API_KEY: "${ARL_API_KEY}"
+      # ARL_ADMIN_API_KEY: "${ARL_ADMIN_API_KEY}"
+      # ARL_REQUIRE_API_KEY: "1"
+    command: >
+      python3 scripts/run_serve.py
+      --config configs/serving_pilot_fraud_torch.yaml
+      --host 0.0.0.0
+      --port 8080
+
+  metrics:
+    build: .
+    ports:
+      - "9091:9091"
+    command: python3 scripts/run_metrics_server.py --config configs/default.yaml --port 9091

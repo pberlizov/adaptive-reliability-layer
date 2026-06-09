@@ -1,0 +1,23 @@
+operating_mode: shadow
+model_version: outreach-v1
+
+policy:
+  name: bandit
+
+replay:
+  batch_size: 32
+  label_delay_steps: 2
+  max_steps: 18
+
+governance:
+  audit_db_path: results/outreach_validation/audit.db
+  snapshot_dir: results/outreach_validation/snapshots
+  environment: outreach
+  persist_snapshots_in_shadow: false
+  persist_snapshots_on_recommend: false
+  persist_snapshots_on_mutation: true
+
+metrics:
+  enabled: false
+
+log_json: false

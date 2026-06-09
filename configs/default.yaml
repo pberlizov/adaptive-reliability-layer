@@ -1,0 +1,64 @@
+operating_mode: shadow
+model_version: source-v1
+
+bounded_auto_actions:
+  - none
+  - hold
+  - bn_refresh
+  - covariate_refresh
+  - recalibrate
+  - label_shift
+
+monitor:
+  alert_threshold: 1.1
+  severe_threshold: 1.75
+  risk_alert_threshold: 8.0
+  risk_decay: 0.92
+
+policy:
+  name: multi_action
+  mild_threshold: 0.95
+  severe_threshold: 1.55
+  cooldown_steps: 2
+  bandit_alpha: 0.75
+
+governance:
+  audit_db_path: .arl/audit.db
+  snapshot_dir: .arl/snapshots
+  max_snapshots: 200
+  policy_version: "1.0.0"
+  environment: development
+
+metrics:
+  enabled: true
+  prometheus_port: 9091
+  namespace: arl
+
+safety_budget:
+  enabled: true
+  window_steps: 24
+  max_auto_actions_per_window: 8
+  max_resets_per_window: 1
+  downgrade_to_recommend: true
+
+replay:
+  timestamp_column: timestamp
+  label_column: label
+  feature_prefix: feature_
+  batch_size: 48
+  label_delay_steps: 0
+  max_steps: 90
+
+log_json: true
+
+sota:
+  enabled: true
+  asr_reset_enabled: false
+  online_conformal_enabled: true
+  timescale_enabled: true
+  drift_detector_enabled: true
+  proactive_drift_enabled: false
+  rccda_budget_enabled: true
+  deferred_adaptation_enabled: false
+  adaptation_safety_enabled: true
+  maintenance_latent_recenter: true

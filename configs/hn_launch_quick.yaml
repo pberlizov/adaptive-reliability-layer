@@ -1,0 +1,113 @@
+# Show HN quick demo — PaySim synthetic only (~2–5 min, no network).
+
+operating_mode: bounded_auto
+model_version: hn-launch-quick-v1
+
+bounded_auto_actions:
+  - none
+  - hold
+  - recalibrate
+  - label_shift
+  - reset
+  - adapt
+  - bn_refresh
+
+policy:
+  name: delayed_hybrid
+  bandit_alpha: 0.85
+  scheduled_retrain_interval: 6
+  max_specialists: 4
+  distance_threshold: 1.25
+  allowed_actions:
+    - none
+    - hold
+    - recalibrate
+    - label_shift
+    - reset
+    - adapt
+    - bn_refresh
+
+monitor:
+  alert_threshold: 1.15
+  severe_threshold: 1.65
+  risk_alert_threshold: 9.0
+  risk_decay: 0.90
+
+safety_budget:
+  enabled: true
+  window_steps: 24
+  max_auto_actions_per_window: 3
+  max_resets_per_window: 1
+  downgrade_to_recommend: true
+
+sota:
+  enabled: true
+  asr_reset_enabled: true
+  online_conformal_enabled: true
+  timescale_enabled: true
+  drift_detector_enabled: true
+  proactive_drift_enabled: true
+  rccda_budget_enabled: true
+  deferred_adaptation_enabled: false
+  adaptation_safety_enabled: true
+  maintenance_latent_recenter: false
+  target_coverage: 0.90
+  max_unsafe_adaptation_rate: 0.15
+
+kpi:
+  accuracy_weight: 0.85
+  false_alert_cost: 0.12
+  drift_cost: 0.04
+  abstention_cost: 0.08
+  reset_cost: 0.06
+  retrain_recommendation_cost: 0.12
+
+replay:
+  batch_size: 64
+  label_delay_steps: 8
+  label_delay_jitter_steps: 2
+  max_steps: 16
+
+governance:
+  audit_db_path: results/hn_launch/audit.db
+  snapshot_dir: results/hn_launch/snapshots
+  environment: hn_launch_quick
+  persist_snapshots_in_shadow: false
+  persist_snapshots_on_recommend: false
+  persist_snapshots_on_mutation: true
+
+policy_state_save_path: null
+metrics:
+  enabled: false
+log_json: false
+
+production_benchmark:
+  controller_name: delayed_hybrid
+  strategies:
+    - frozen
+    - delayed_hybrid
+    - scheduled_retrain
+    - naive
+  baseline_strategies:
+    - scheduled_retrain
+    - naive
+  require_beat_baselines: false
+  min_core_sources_passing: 1
+  evidence:
+    min_utility_delta: 0.005
+    min_risk_reduction_pct: 5.0
+    min_stream_records: 2000
+    min_adaptation_safety_rate: 0.85
+    stretch_utility_delta: 0.01
+    stretch_risk_reduction_pct: 10.0
+
+sources:
+  - id: paysim_fraud_torch
+    tier: core
+    description: PaySim synthetic — toy temporal replay (no download)
+    steps: 16
+    batch_size: 64
+    stream_cycles: 2
+    label_delay_steps: 8
+    label_delay_jitter_steps: 2
+    temporal_split: true

@@ -1,0 +1,29 @@
+# Datasets — download separately (see scripts/fetch_public_fraud_raw.py and docs/data_setup.md)
+data/
+
+# Runtime artifacts
+.arl/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# Benchmark results (reproduce with: arl-hn-launch)
+results/
+
+# Temp
+.tmp/
+
+# IDE / OS
+.DS_Store
+.idea/
+.vscode/

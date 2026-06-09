@@ -1,0 +1,87 @@
+operating_mode: shadow
+model_version: paysim-torch-sidecar-v1
+
+bounded_auto_actions:
+  - none
+  - hold
+  - recalibrate
+  - label_shift
+  - reset
+
+policy:
+  name: regime_aware_delayed_bandit
+  bandit_alpha: 0.85
+  allowed_actions:
+    - none
+    - hold
+    - recalibrate
+    - label_shift
+    - reset
+
+monitor:
+  alert_threshold: 1.15
+  severe_threshold: 1.65
+  risk_alert_threshold: 9.0
+  risk_decay: 0.90
+
+safety_budget:
+  enabled: true
+  window_steps: 32
+  max_auto_actions_per_window: 1
+  max_resets_per_window: 1
+  downgrade_to_recommend: true
+
+replay:
+  batch_size: 64
+  label_delay_steps: 4
+
+governance:
+  audit_db_path: results/sidecar/audit.db
+  snapshot_dir: results/sidecar/snapshots
+  environment: sidecar
+  persist_snapshots_in_shadow: false
+  persist_snapshots_on_recommend: false
+  persist_snapshots_on_mutation: true
+
+policy_state_path: null
+policy_state_save_path: results/sidecar/policy_state.json
+# HA policy state (Phase C):
+# policy_state_backend: file   # file (default) | redis
+# policy_state_backend: redis
+# policy_state_redis_url: redis://localhost:6379/0
+# policy_state_redis_key: arl:policy:paysim-torch
+
+metrics:
+  enabled: true
+  prometheus_port: 9091
+  namespace: arl_sidecar
+
+log_json: true
+
+serving:
+  model_bundle: paysim_fraud_torch
+  max_batch_rows: 256
+  max_pending_batches: 4096
+  allow_duplicate_batch_id: false
+  prometheus_path: /metrics
+  rate_limit_rpm: 600
+  audit_export_dir: results/sidecar/audit_exports
+  public_paths:
+    - /v1/health
+    # Remove /metrics from public_paths in production to require API key for scrapes
+    - /metrics
+  require_api_key: false
+  # Production: set require_api_key: true and provide ARL_API_KEY
+  # admin_api_key: set via ARL_ADMIN_API_KEY for mode switch / rollback / audit export
+  max_request_bytes: 4000000
+  security_headers_enabled: true
+  disable_openapi: true
+  # trusted_hosts:
+  #   - sidecar.internal
+  #   - localhost
+
+sota:
+  enabled: true
+  asr_reset_enabled: true
+  proactive_drift_enabled: true
+  deferred_adaptation_enabled: false

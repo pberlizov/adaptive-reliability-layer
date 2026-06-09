@@ -1,0 +1,27 @@
+operating_mode: shadow
+model_version: pilot-fraud-v1
+
+policy:
+  name: bandit
+
+replay:
+  batch_size: 48
+  label_delay_steps: 4
+  max_steps: 72
+
+governance:
+  audit_db_path: results/pilot/audit.db
+  snapshot_dir: results/pilot/snapshots
+  environment: pilot
+
+safety_budget:
+  enabled: true
+  window_steps: 24
+  max_auto_actions_per_window: 6
+  max_resets_per_window: 1
+  downgrade_to_recommend: true
+
+metrics:
+  enabled: false
+
+log_json: true

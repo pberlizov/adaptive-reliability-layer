@@ -1,0 +1,154 @@
+# HN launch — faster production claim suite (same thresholds, shorter replay horizon).
+
+operating_mode: bounded_auto
+model_version: hn-launch-v1
+
+bounded_auto_actions:
+  - none
+  - hold
+  - recalibrate
+  - label_shift
+  - reset
+  - adapt
+  - bn_refresh
+
+policy:
+  name: delayed_hybrid
+  bandit_alpha: 0.85
+  scheduled_retrain_interval: 6
+  max_specialists: 4
+  distance_threshold: 1.25
+  allowed_actions:
+    - none
+    - hold
+    - recalibrate
+    - label_shift
+    - reset
+    - adapt
+    - bn_refresh
+
+monitor:
+  alert_threshold: 1.15
+  severe_threshold: 1.65
+  risk_alert_threshold: 9.0
+  risk_decay: 0.90
+
+safety_budget:
+  enabled: true
+  window_steps: 48
+  max_auto_actions_per_window: 3
+  max_resets_per_window: 1
+  downgrade_to_recommend: true
+
+sota:
+  enabled: true
+  asr_reset_enabled: true
+  online_conformal_enabled: true
+  timescale_enabled: true
+  drift_detector_enabled: true
+  proactive_drift_enabled: true
+  rccda_budget_enabled: true
+  deferred_adaptation_enabled: false
+  adaptation_safety_enabled: true
+  maintenance_latent_recenter: false
+  target_coverage: 0.90
+  max_unsafe_adaptation_rate: 0.15
+
+kpi:
+  accuracy_weight: 0.85
+  false_alert_cost: 0.12
+  drift_cost: 0.04
+  abstention_cost: 0.08
+  reset_cost: 0.06
+  retrain_recommendation_cost: 0.12
+
+replay:
+  batch_size: 128
+  label_delay_steps: 12
+  label_delay_jitter_steps: 6
+  max_steps: 48
+
+governance:
+  audit_db_path: results/hn_launch/audit.db
+  snapshot_dir: results/hn_launch/snapshots
+  environment: hn_launch
+  persist_snapshots_in_shadow: false
+  persist_snapshots_on_recommend: false
+  persist_snapshots_on_mutation: true
+
+policy_state_save_path: null
+metrics:
+  enabled: false
+log_json: false
+
+production_benchmark:
+  controller_name: delayed_hybrid
+  strategies:
+    - frozen
+    - delayed_hybrid
+    - scheduled_retrain
+    - naive
+  baseline_strategies:
+    - scheduled_retrain
+    - naive
+  require_beat_baselines: true
+  beat_baselines_min_delta: -0.005
+  min_core_sources_passing: 2
+  evidence:
+    min_utility_delta: 0.005
+    min_risk_reduction_pct: 5.0
+    min_stream_records: 20000
+    min_adaptation_safety_rate: 0.85
+    stretch_utility_delta: 0.01
+    stretch_risk_reduction_pct: 10.0
+
+sources:
+  - id: ulb_creditcard_fraud_torch
+    tier: core
+    description: ULB credit card — temporal split, delayed labels
+    steps: 120
+    batch_size: 128
+    stream_cycles: 6
+    label_delay_steps: 12
+    label_delay_jitter_steps: 6
+    temporal_split: true
+
+  - id: ieee_cis_fraud_torch
+    tier: core
+    description: IEEE-CIS — temporal split, delayed labels
+    steps: 120
+    batch_size: 128
+    stream_cycles: 8
+    label_delay_steps: 12
+    label_delay_jitter_steps: 6
+    temporal_split: true
+
+  - id: paysim_fraud_torch
+    tier: core
+    description: PaySim — temporal split, delayed labels
+    steps: 96
+    batch_size: 128
+    stream_cycles: 8
+    label_delay_steps: 8
+    label_delay_jitter_steps: 4
+    temporal_split: true
+
+  - id: elliptic_fraud_torch
+    tier: extended
+    description: Elliptic Bitcoin txs — temporal split (Kaggle or bundled fallback)
+    steps: 40
+    batch_size: 128
+    stream_cycles: 4
+    label_delay_steps: 12
+    label_delay_jitter_steps: 4
+    temporal_split: true
+
+  - id: baf_fraud_torch
+    tier: extended
+    description: BAF Base account fraud — temporal split (Kaggle or bundled fallback)
+    steps: 40
+    batch_size: 128
+    stream_cycles: 4
+    label_delay_steps: 12
+    label_delay_jitter_steps: 4
+    temporal_split: true

@@ -1,0 +1,67 @@
+# Accuracy experiment campaign — hard fraud temporal slices only.
+
+operating_mode: bounded_auto
+model_version: accuracy-experiment-v1
+
+bounded_auto_actions:
+  - none
+  - hold
+  - recalibrate
+  - label_shift
+  - reset
+  - adapt
+
+policy:
+  name: regime_aware_delayed_bandit
+  bandit_alpha: 0.85
+  scheduled_retrain_interval: 6
+  threshold_learning_rate: 0.10
+  allowed_actions:
+    - none
+    - hold
+    - recalibrate
+    - label_shift
+    - reset
+    - adapt
+
+monitor:
+  alert_threshold: 1.15
+  severe_threshold: 1.65
+  risk_alert_threshold: 9.0
+  risk_decay: 0.90
+
+kpi:
+  false_alert_cost: 0.06
+  retrain_recommendation_cost: 0.08
+
+sota:
+  proactive_drift_enabled: false
+  online_conformal_enabled: true
+
+replay:
+  batch_size: 64
+  label_delay_steps: 12
+  label_delay_jitter_steps: 2
+  max_steps: 32
+
+discrimination_benchmark:
+  controller_name: regime_aware_delayed_bandit
+  min_rankable_metrics: 2
+  min_metric_spread: 0.005
+  false_positive_cost: 1.0
+  false_negative_cost: 10.0
+  strategies:
+    - frozen
+  sources:
+    - id: ieee_cis_fraud_torch_hard
+      tier: discrimination
+      steps: 32
+      label_delay_steps: 12
+    - id: ulb_creditcard_fraud_torch_hard
+      tier: discrimination
+      steps: 32
+      label_delay_steps: 12
+    - id: paysim_fraud_torch_hard
+      tier: discrimination
+      steps: 32
+      label_delay_steps: 8

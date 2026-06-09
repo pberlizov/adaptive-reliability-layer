@@ -1,0 +1,76 @@
+# Context-augmented fraud comparison suite.
+
+operating_mode: bounded_auto
+model_version: discrimination-fraud-context-v1
+
+bounded_auto_actions:
+  - none
+  - hold
+  - recalibrate
+  - label_shift
+  - reset
+  - adapt
+
+policy:
+  name: fraud_context_delayed_bandit
+  bandit_alpha: 0.85
+  scheduled_retrain_interval: 6
+  allowed_actions:
+    - none
+    - hold
+    - recalibrate
+    - label_shift
+    - reset
+    - adapt
+
+monitor:
+  alert_threshold: 1.15
+  severe_threshold: 1.65
+  risk_alert_threshold: 9.0
+  risk_decay: 0.90
+
+kpi:
+  false_alert_cost: 0.06
+  retrain_recommendation_cost: 0.08
+
+replay:
+  batch_size: 64
+  label_delay_steps: 12
+  label_delay_jitter_steps: 2
+  max_steps: 32
+
+discrimination_benchmark:
+  controller_name: fraud_context_delayed_bandit
+  min_rankable_metrics: 2
+  min_metric_spread: 0.005
+  false_positive_cost: 1.0
+  false_negative_cost: 10.0
+  strategies:
+    - frozen
+    - regime_aware_delayed_bandit
+    - fraud_rank_delayed_bandit
+    - fraud_context_delayed_bandit
+    - delayed_hybrid
+  sources:
+    - id: ieee_cis_fraud_torch_context_hard
+      tier: discrimination
+      description: IEEE-CIS hard temporal slice with temporal-context feature augmentation
+      steps: 32
+      label_delay_steps: 12
+    - id: elliptic_fraud_torch_context_hard
+      tier: discrimination
+      description: Elliptic hard temporal slice with temporal-context feature augmentation
+      steps: 32
+      label_delay_steps: 12
+    - id: openml_electricity_torch
+      tier: discrimination
+      description: OpenML electricity chronological stream - operational drift wedge
+      steps: 24
+      batch_size: 48
+      label_delay_steps: 4
+    - id: uci_gas_sensor_drift_torch
+      tier: discrimination
+      description: UCI gas sensor natural batch drift - frozen should degrade across sensor batches
+      steps: 24
+      batch_size: 48
+      label_delay_steps: 4
