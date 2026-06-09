@@ -2,7 +2,7 @@
 
 **Stop retraining your fraud model every time a drift alarm fires.**
 
-ARL sits between your inference pipeline and your monitoring layer. It detects distribution shift, decides whether adaptation is actually warranted, learns from delayed revealed labels (chargebacks, disputes — weeks after inference), and takes the smallest bounded steering step that stabilizes the model: correction first, explicit mutation only when needed. Most drift alarms don't require a retrain. ARL tells you which ones do, proves it, and logs every decision. It does not replace your model.
+ARL sits between your inference pipeline and your monitoring layer. It detects distribution shift, decides whether adaptation is actually warranted, learns from delayed revealed labels (chargebacks, disputes - weeks after inference), and takes the smallest bounded steering step that stabilizes the model: correction first, explicit mutation only when needed. Most drift alarms don't require a retrain. ARL tells you which ones do, proves it, and logs every decision. It does not replace your model.
 
 ```bash
 pip install "adaptive-reliability-layer[torch,serving]"
@@ -13,9 +13,9 @@ arl-demo   # ~2 min, no downloads, runs on your machine
 
 ## Why this exists
 
-Public fraud streams (ULB, IEEE-CIS, PaySim) show **94–99% frozen accuracy** — accuracy looks fine. But the model is quietly degrading on shifted segments, and the standard fix (scheduled retrain) fires too late and adapts too broadly.
+Public fraud streams (ULB, IEEE-CIS, PaySim) show good accuracy. But the model is quietly degrading on shifted segments, and the standard fix (scheduled retrain) fires too late and adapts too broadly, in addition to being expensive.
 
-For AML and fraud teams, a retrain isn't a free operation. It means: retraining on millions of labeled transactions, engineering the dataset, running backtests, getting model risk sign-off (SR 11-7 / TRIM in regulated institutions), staging a deployment, and holding a rollback window. Teams that retrain on a fixed schedule — or every time a drift alarm fires — are paying that cost repeatedly for shifts that either resolve on their own or don't affect decision quality. ARL's primary job is to distinguish "this shift requires intervention" from "this shift can be safely held," and to take the smallest bounded action that stabilizes the model — deferring unnecessary retrains and their associated compliance overhead.
+For AML and fraud teams, a retrain isn't a free operation. It means: retraining on millions of labeled transactions, engineering the dataset, running backtests, getting model risk sign-off (SR 11-7 / TRIM in regulated institutions), staging a deployment, and holding a rollback window. Teams that retrain on a fixed schedule, or every time a drift alarm fires, are paying that cost repeatedly for shifts that either resolve on their own or don't affect decision quality. ARL's primary job is to distinguish "this shift requires intervention" from "this shift can be safely held," and to take the smallest bounded action that stabilizes the model — deferring unnecessary retrains and their associated compliance overhead.
 
 The core problem is harder than it looks: **labels arrive weeks after inference** (fraud chargebacks, engine failures, clinical outcomes). You can't do standard online learning. You need a controller that learns from delayed feedback, knows when to hold, and can prove it didn't harm anything.
 
@@ -33,7 +33,7 @@ The core problem is harder than it looks: **labels arrive weeks after inference*
 
 **Suite: 3/3 PASS** (`require_beat_baselines: true`). All baselines evaluated with the same torch adapter, same temporal split, same 12-step label delay.
 
-**Risk** = composite proxy: the strongest reduction among martingale capital, drift-alert rate, and retrain recommendations versus frozen. Raw fraud accuracy is flat across all methods (94–99%) — these are operational metrics, not detection quality metrics.
+**Risk** = composite proxy: the strongest reduction among martingale capital, drift-alert rate, and retrain recommendations versus frozen. Raw fraud accuracy is flat across all methods (94–99%), these are operational metrics, not detection quality metrics.
 
 **Utility** = replay accuracy minus operational penalties such as sustained risk alerts, parameter drift, abstention, and resets. Retrain deferral is reported separately in the risk / operations story. Full spec: [docs/risk_metric_spec.md](docs/risk_metric_spec.md).
 
@@ -96,7 +96,7 @@ arl-demo
 # same as: arl-hn-launch --quick
 ```
 
-Runs PaySim synthetic stream → production benchmark → hard-slice benchmark → writes `results/hn_launch/comparison_table_quick.md`. **This is a 1-source toy run.** The three-source numbers in this README require the full suite below.
+Runs PaySim synthetic stream → production benchmark → hard-slice benchmark → writes `results/hn_launch/comparison_table_quick.md`. **This is a quick 1-source toy run.** The three-source numbers in this README require the full suite below.
 
 **Full five-dataset suite — 30–90 min:**
 
